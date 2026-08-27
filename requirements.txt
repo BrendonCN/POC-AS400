@@ -1,0 +1,9 @@
+# In-venv Python packages (pip install -r requirements.txt)
+p5250==0.1.0
+p3270==0.1.6
+py3270==0.3.5
+robotframework==7.4.2
+robotframework-mainframe3270==4.3
+ibmi-mcp==1.1.0
+# ibmi-mcp still uses FastMCP; mcp 2.x breaks import
+mcp>=1.0.0,<2
