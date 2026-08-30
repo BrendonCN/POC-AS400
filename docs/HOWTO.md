@@ -1,37 +1,108 @@
 # AS400 / IBM i UI automation — HOWTO
 
-Green-screen (TN5250 / TN3270) automation options for this repo. Python packages below are installed in `.venv` via `requirements.txt`. External tools (Java / native / vendor) are documented but not pip-installable.
+Green-screen (TN5250 / TN3270) automation options for this repo.
+
+**Primary for IBM Host On-Demand (`.hod`) GUI:** the stdlib package [`as400_hod`](as400_hod/) (section 0 below) — **no pip packages**.
+
+Other options use packages from `requirements.txt` (s3270-based, Robot, MCP) or external Java/native tools.
 
 ## Shared prerequisites
 
 1. **Python 3.10+** (setup verified on 3.12)
-2. **`s3270` / `wc3270`** from [x3270](http://x3270.bgp.nu/) for Python/Robot libs that wrap it  
+2. For **`.hod` GUI automation**: a running IBM Host On-Demand session window (Windows)
+3. For **protocol / s3270 stacks**: **`s3270` / `wc3270`** from [x3270](http://x3270.bgp.nu/)  
    - Windows example path: `C:\wc3270\`
-3. Network reachability to the IBM i host (TN5250 often port **23**, TLS often **992**)
+4. Network reachability to the IBM i host (TN5250 often port **23**, TLS often **992**) when not using a pre-opened HOD session
 
 ```powershell
+# Optional: third-party stacks only (not needed for as400_hod)
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-| In venv | Protocol focus | Role |
-|---------|----------------|------|
-| `p5250` + `p3270` | 5250 via s3270 keymaps | Python Selenium-style scripts |
-| `py3270` | 3270 | Low-level Python + x3270/s3270 |
-| `robotframework` + `robotframework-mainframe3270` | 3270 | Robot Framework keywords |
-| `ibmi-mcp` | 5250 | MCP server for AI agents |
-
-| Outside venv | Notes |
-|--------------|--------|
-| [tn5250j](https://tn5250j.github.io/) | Java 5250 emulator + macros / scripting |
-| [5250ng](https://5250ng.com/) | Native emulator + 5250Script + MCP |
-| IBM Access Client Solutions | Vendor macros / recorded scripts |
+| Option | Needs pip? | Role |
+|--------|------------|------|
+| **`as400_hod` (stdlib)** | No | Selenium-like control of a live HOD `.hod` window |
+| `p5250` + `p3270` | Yes | Headless 5250 via s3270 |
+| `py3270` | Yes | Low-level x3270/s3270 |
+| `robotframework` + Mainframe3270 | Yes | Keyword suites |
+| `ibmi-mcp` | Yes | MCP server for AI agents |
+| tn5250j / 5250ng / ACS | Outside venv | Alternate emulators / macros |
 
 ---
 
-## 1. p5250 (recommended for AS/400 Python)
+## 0. as400_hod — stdlib Host On-Demand driver (recommended for `.hod`)
+
+Package: [`as400_hod/`](as400_hod/). **Python standard library only** (`ctypes` for Win32 / UI Automation). No entries in `requirements.txt`.
+
+**Detailed how-to and usage samples:** [docs/USAGE.md](docs/USAGE.md)
+
+Attaches to an **already open** IBM Host On-Demand window, drives it in the **background** (PostMessage — does not steal focus from other apps), and supports Selenium-like click / type / get-text / wait.
+
+### Features
+
+| Goal | API |
+|------|-----|
+| Attach | `HodDriver.attach(title_contains=".hod")` |
+| Click cell | `driver.click(row=6, col=53)` |
+| Type / AID keys | `driver.send_keys("USER", Keys.TAB, Keys.ENTER)` |
+| Screen text | `driver.get_screen_text()` (UIA, then clipboard fallback) |
+| Find by text | `driver.find_element(By.TEXT, "Sign On")` |
+| Find by cell | `driver.find_element(By.ROW_COL, (5, 10))` |
+| Wait / verify | `driver.wait_until_text_contains("Main Menu", timeout=20)` |
+| Window closed | raises **`HodWindowClosedError`** and stops further steps |
+
+### Quick start
+
+```powershell
+# Open your .hod session in Host On-Demand first, then:
+python examples/attach_and_read.py --title ".hod"
+python -m unittest tests.test_as400_hod -v
+```
+
+```python
+from as400_hod import HodDriver, By, Keys, HodWindowClosedError
+
+driver = HodDriver.attach(
+    title_contains=".hod",
+    cell_size=(9, 16),   # calibrate to HOD font
+    origin=(0, 0),       # client offset to top-left of terminal grid
+)
+
+try:
+    driver.click(row=6, col=53)
+    driver.send_keys("MYUSER")
+    driver.send_keys(Keys.TAB)
+    driver.send_keys("MYPASS")
+    driver.send_keys(Keys.ENTER)
+    driver.wait_until_text_contains("Main Menu", timeout=20)
+    print(driver.get_screen_text())
+except HodWindowClosedError:
+    # .hod window was closed — stop the script
+    raise
+finally:
+    driver.quit()  # detaches only; does not close HOD
+```
+
+### Text strategies
+
+- **`auto`** (default): UI Automation tree under the HOD HWND; if empty, Ctrl+A / Ctrl+C clipboard fallback
+- **`uia`**: UIA only (best when Java Access Bridge exposes the terminal)
+- **`clipboard`**: hotkey copy only (shares the system clipboard briefly; does not move focus)
+
+### Limitations
+
+- Java AWT may ignore posted mouse/key messages on some HOD builds; quality is build-dependent. Default policy never steals focus.
+- UIA text quality depends on Java Access Bridge / accessibility exposure.
+- Clipboard fallback can race with the user’s paste buffer.
+- Calibrate `cell_size` and `origin` once per HOD font/window size for accurate row/col clicks.
+- Automates the **existing GUI session**, not a headless TN5250 connection (see p5250 below for that).
+
+---
+
+## 1. p5250 (headless AS/400 via s3270)
 
 [GitHub](https://github.com/simonfaltum/p5250) · [PyPI](https://pypi.org/project/p5250/)
 
@@ -263,7 +334,8 @@ IBM’s official client. Use **macros / recorded scripts** inside ACS for light 
 
 | Goal | Pick |
 |------|------|
-| Python scripts against AS/400 like Selenium | **p5250** |
+| Automate an open IBM HOD `.hod` window (stdlib, Selenium-like) | **`as400_hod`** |
+| Headless Python scripts against AS/400 like Selenium | **p5250** |
 | Robot keyword suites (3270-style) | **Mainframe3270** |
 | Custom low-level x3270 control | **py3270** |
 | AI / Cursor / Claude driving green screen | **ibmi-mcp** (or 5250ng MCP) |

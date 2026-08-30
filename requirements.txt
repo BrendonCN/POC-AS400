@@ -1,4 +1,5 @@
 # In-venv Python packages (pip install -r requirements.txt)
+# Note: as400_hod (stdlib HOD .hod driver) needs NO packages from this file.
 p5250==0.1.0
 p3270==0.1.6
 py3270==0.3.5
