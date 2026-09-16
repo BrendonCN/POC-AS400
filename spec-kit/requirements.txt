@@ -1,0 +1,5 @@
+# spec-kit — no third-party packages required.
+# Use a local venv for isolation only:
+#   python -m venv .venv
+#   .\.venv\Scripts\Activate.ps1
+# Then run: python scripts/i18n.py --locale en
