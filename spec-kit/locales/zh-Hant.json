@@ -20,5 +20,12 @@
   "status.fail": "失敗",
   "cli.usage": "本地翻譯輔助程式（僅標準函式庫）",
   "cli.loaded": "已載入語系",
-  "cli.keys": "鍵值"
+  "cli.keys": "鍵值",
+  "pipeline.parse": "解析大綱規格",
+  "pipeline.generate": "產生測試案例與邏輯圖",
+  "flow.funds_transfer": "資金調撥登錄",
+  "flow.accounting_menu": "會計選單",
+  "flow.file_update": "檔案更新",
+  "flow.print_process": "列印處理",
+  "flow.error_checking": "錯誤檢查"
 }

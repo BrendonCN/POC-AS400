@@ -63,3 +63,14 @@ python scripts\i18n.py --locale zh-Hant --key project.title
 2. 複製 [`templates/testcases.md`](templates/testcases.md) → `testcases/…`。
 3. 複製 [`templates/logic-diagram.md`](templates/logic-diagram.md) → `diagrams/…`。
 4. 共用標籤請同時更新兩個 locale JSON。
+
+### 大綱規格（AS/400 階層式）
+
+針對類似 [`specs/example _flow.en.md`](specs/example%20_flow.en.md) 的文件：
+
+```powershell
+python scripts\spec_pipeline.py "specs\example _flow.en.md"
+python scripts\spec_pipeline.py "specs\example _flow.en.md" --locale zh-Hant
+```
+
+詳見 [HOWTO.zh-Hant.md](HOWTO.zh-Hant.md)。

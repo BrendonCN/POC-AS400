@@ -5,3 +5,6 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .Python
+
+# Generated parse dumps (markdown artifacts under testcases/ diagrams/ are kept)
+out/

@@ -20,5 +20,12 @@
   "status.fail": "Fail",
   "cli.usage": "Local translation helper (stdlib only)",
   "cli.loaded": "Loaded locale",
-  "cli.keys": "Keys"
+  "cli.keys": "Keys",
+  "pipeline.parse": "Parse outline specification",
+  "pipeline.generate": "Generate test cases and logic diagrams",
+  "flow.funds_transfer": "Registration of Funds Transfer",
+  "flow.accounting_menu": "Accounting Menu",
+  "flow.file_update": "File Update",
+  "flow.print_process": "Print Process",
+  "flow.error_checking": "Error Checking"
 }

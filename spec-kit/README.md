@@ -70,3 +70,14 @@ python scripts\i18n.py --locale zh-Hant --key project.title
 2. Copy [`templates/testcases.md`](templates/testcases.md) → `testcases/…`.
 3. Copy [`templates/logic-diagram.md`](templates/logic-diagram.md) → `diagrams/…`.
 4. Add any shared UI labels to both locale JSON files.
+
+### Outline specs (AS/400 hierarchical)
+
+For documents like [`specs/example _flow.en.md`](specs/example%20_flow.en.md) (`・1` / `①` / `F-1` style):
+
+```powershell
+python scripts\spec_pipeline.py "specs\example _flow.en.md"
+python scripts\spec_pipeline.py "specs\example _flow.en.md" --locale zh-Hant
+```
+
+See [HOWTO.md](HOWTO.md#8-outline-spec-pipeline-example-_flow).

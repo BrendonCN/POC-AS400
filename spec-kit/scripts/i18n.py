@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Minimal local EN / zh-Hant translation helper (stdlib only)."""
+"""Minimal local EN / zh-Hant translation helper (stdlib only).
+
+For outline tech-spec → testcase / diagram generation, use:
+  python scripts/spec_pipeline.py "specs/example _flow.en.md"
+"""
 
 from __future__ import annotations
 

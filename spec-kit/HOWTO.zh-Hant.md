@@ -181,3 +181,18 @@ python scripts\i18n.py --locale zh-Hant
 | 追蹤 | `REQ-NN` = `TC-NN` = 圖節點標籤 |
 | 標籤 | 編輯 `locales/*.json`，用 `scripts/i18n.py` 查詢 |
 | 範例 | 從 `SAMPLE-flow.*.md` 開始 |
+
+## 8. 大綱規格管線（example _flow）
+
+階層式 AS/400 規格（標記 `・1`、`I/II`、`①`、`(1)`、`F-1`、訊息代碼）請用標準函式庫管線產生產物：
+
+```powershell
+cd spec-kit
+.\.venv\Scripts\Activate.ps1
+python scripts\spec_pipeline.py --dry-run "specs\example _flow.en.md"
+python scripts\spec_pipeline.py "specs\example _flow.en.md"
+python scripts\spec_pipeline.py "specs\example _flow.en.md" --locale zh-Hant
+```
+
+輸出：`out/*.json`、`testcases/<basename>.*.md`、`diagrams/<basename>.*.md`。
+

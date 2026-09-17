@@ -173,11 +173,25 @@ python scripts\i18n.py --locale zh-Hant
 
 ---
 
-## 7. Quick reference
+## 8. Outline spec pipeline (example _flow)
 
-| Goal | Action |
-|------|--------|
-| New flow | Copy `templates/*` → `specs/` + `testcases/` + `diagrams/` (EN + TC) |
-| Traceability | `REQ-NN` = `TC-NN` = diagram labels |
-| Labels | Edit `locales/*.json`, query with `scripts/i18n.py` |
-| Sample | Start from `SAMPLE-flow.*.md` |
+For hierarchical AS/400-style specs (markers `・1`, `I/II`, `①`, `(1)`, `F-1`, message codes), use the stdlib pipeline instead of hand-copying SAMPLE templates:
+
+```powershell
+cd spec-kit
+.\.venv\Scripts\Activate.ps1
+python scripts\spec_pipeline.py --dry-run "specs\example _flow.en.md"
+python scripts\spec_pipeline.py "specs\example _flow.en.md"
+python scripts\spec_pipeline.py "specs\example _flow.en.md" --locale zh-Hant
+```
+
+This writes:
+
+| Output | Location |
+|--------|----------|
+| Parsed JSON | `out/<basename>.json` |
+| Test cases | `testcases/<basename>.en.md` (or `.zh-Hant.md`) |
+| Logic diagrams | `diagrams/<basename>.en.md` |
+
+Scripts: [`outline_parser.py`](scripts/outline_parser.py), [`generate_artifacts.py`](scripts/generate_artifacts.py), [`spec_pipeline.py`](scripts/spec_pipeline.py). Locale labels remain in [`i18n.py`](scripts/i18n.py).
+
